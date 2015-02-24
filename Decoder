@@ -1,0 +1,100 @@
+module Decoder where 
+
+import AuxiliaryFunctions
+import ErrorFunctions
+import Verification
+import Decryption
+
+-- @Author: Mike Kerkhoff, 2015
+--
+--
+-- This programm decrypts any code defined as follows:  
+--
+-- Code := (ValidationCode :: String, MainCode :: String, DecryptionCode :: String)
+--
+-- As for example: ("AXDE", "1363", "23DA")
+--
+-- The validation code consists of specific upper-case letters and is used to check if a entered code is valid.
+--
+-- The main code contains the all the information to be decrypted and contains up too five numeric values stored
+-- within a String. 
+--
+-- The decryption code chooses the algorithm used to decode the information
+-- stored within the main code and consists of either upper-case letters or numeric values. 
+
+{- 
+
+The main function
+
+-}
+
+main :: IO()
+main = do 	
+		blankLines
+	       	putStr "Welcome!"
+		blankLines
+		putStr "Please enter your validation code:"
+		blankLines
+
+{- 
+
+The input of the validation code
+
+-}
+
+		validationCode <- getLine
+		blankLines
+
+		putStr "Please enter the corresponding main code:"
+		blankLines
+
+{- 
+
+The input of the main code
+
+-}
+		mainCode <- getLine
+		blankLines
+
+		putStr "Please enter your decryption code:"
+		blankLines
+
+{- 
+
+The input of the decryption code
+
+-}
+
+		decryptionCode <- getLine
+		blankLines
+
+{- 
+
+The verification of the entered code
+
+-}
+
+		if 
+			(check_Code (constructCode validationCode mainCode decryptionCode))
+		then do  
+			putStr "Here is your code:"
+			blankLines
+			putStr (showCode validationCode mainCode decryptionCode)
+			blankLines
+			putStr "Here is your decrypted code:"
+			blankLines
+			
+			
+
+{- 
+
+The code is checked again for its validity and is then decrypted
+
+-}
+			
+			putStr (decode (constructCode (validationCode) (mainCode) (decryptionCode)))
+			blankLines
+			
+		else do
+			 error_invalidCode
+			 blankLines
