@@ -1,0 +1,114 @@
+module Verification where
+
+import Datatypes
+import AuxiliaryFunctions
+import Data.Char
+
+-- @Author: Mike Kerkhoff, 2015
+--
+--
+-- In this module you can find all of the functions needed to verify if a a given 
+-- code is valid or not. 
+--
+-- A valid code contains three elements:
+--
+-- Validation code
+-- Main code
+-- Decryption code
+-- 
+-- The validation code must contain three Char of the following List ['A'..'Z']
+-- 
+-- The main code contains at least three and at most five Char of the list ['0'..'9']. 
+-- Any other Char or symbols are not allowed. 
+-- 
+-- The decryption code contains four Char. Each of these four must be an element of 
+-- the one of these Lists: ['0'..'9'], ['A'..'Z']
+--
+-- If further explanations are necessary, please read the comments beneath. 
+ 
+
+-- Checks if a given Char is an element of the list ['A'..'Z']
+
+check_Char :: Char -> Bool
+check_Char a 
+		  | a `elem` ['A'..'Z'] = True
+		  | otherwise = False
+
+-- Checks if a given Char is an element of the list ['0'..'9']
+
+check_Int :: Char -> Bool
+check_Int a 
+		 | a `elem` ['0'..'9'] = True
+		 | otherwise = False
+
+-- Checks if the validation code is valid
+
+check_ValidationCode :: ValidationCode -> Bool 
+check_ValidationCode [] 	= False
+check_ValidationCode (x:b:[])	= (check_Char x && x /= b && b `elem` ['X', 'C', 'D', 'E'])
+check_ValidationCode (x:xs) 	= if (check_Char x) 
+					  then (check_ValidationCode xs) 
+					  else (False)
+
+-- Checks if the main code is valid
+
+check_MainCode :: MainCode -> Bool
+check_MainCode [] 		= False
+check_MainCode (x:[]) 		= (check_Int x)
+check_MainCode (x:xs) 		= if (check_Int x) 
+					  then (check_MainCode xs) 
+					  else (False)
+			
+-- Checks if the decryption code is valid 
+
+check_DecryptionCode :: DecryptionCode -> Bool
+check_DecryptionCode [] 	= False
+check_DecryptionCode (x:[]) 	= (check_Int x || check_Char x)
+check_DecryptionCode (x:xs) 	= if (check_Int x || check_Char x) 
+				       	  then (check_DecryptionCode xs) 
+				       	  else (False)
+
+-- Checks if the content of the code have the valid size and length. If one of the touple
+-- parts are too small or short, it returns False. Else it returns True 
+
+check_CodeLength :: Code -> Bool
+check_CodeLength a
+
+			| (length (firstElement a)) 				/= 4 		= False
+			| (length (secondElement a)) 				< 4		= False
+			| (length (secondElement a))    			> 5 		= False
+			| (length (thirdElement a)) 				/= 4 		= False
+			| otherwise 								= True
+	
+
+-- Checks if the content of the code are valid. If one of the touple parts contains
+-- an invalid set of Char, it returns False 
+
+check_CodeElements :: Code -> Bool
+check_CodeElements a 
+
+			  |(check_ValidationCode (firstElement a)) 	== False 	= False
+			  |(check_MainCode (secondElement a)) 		== False 	= False
+			  |(check_DecryptionCode (thirdElement a)) 	== False 	= False
+			  |otherwise 								= True
+
+-- Checks the content of a code. If one of the touple parts is empty, it returns false.
+-- Else it returns False
+
+check_CodeContent :: Code -> Bool
+check_CodeContent a 
+
+			| (firstElement a) 		== [] 	= False 
+			| (secondElement a) 		== [] 	= False
+			| (thirdElement a) 		== [] 	= False
+			| otherwise 		        	= True
+
+-- Checks if a code is valid. The function returns True if the code is valid
+
+check_Code :: Code -> Bool 
+check_Code a
+
+		 	| (check_CodeElements a)	 == (False) = False
+		  	| (check_CodeLength a) 	 == (False) = False
+		  	| (check_CodeContent a)	 == (False) = False
+		  	| otherwise 				    = True 
