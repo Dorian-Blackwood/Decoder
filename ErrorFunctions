@@ -1,0 +1,15 @@
+module ErrorFunctions where
+
+import AuxiliaryFunctions
+
+-- @Author: Mike Kerkhoff, 2015
+--
+-- In this module you can find all of the functions needed to 
+-- prevent the programm from crashing in case an error occurs 
+
+-- Error-Function in case of an invalid code
+
+error_invalidCode :: IO ()
+error_invalidCode = do 
+			error "Invalid input: Error code - 0"
+			blankLines
