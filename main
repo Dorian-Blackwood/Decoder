@@ -1,5 +1,3 @@
-module Decoder where 
-
 import AuxiliaryFunctions
 import ErrorFunctions
 import Verification
