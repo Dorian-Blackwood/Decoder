@@ -1,0 +1,46 @@
+module Datatypes where
+
+-- @Author: Mike Kerkhoff, 2015
+--
+-- In this module you can find all Datatypes which the decoder and it's modules need to function.  
+
+-- A code consists of a touple with three elements: A validation code, a main code and a decription code. 
+
+type Code = (ValidationCode, MainCode, DecryptionCode)
+
+-- The validation code is used (as the name already says) to check the validity of a code.
+-- It consists of selected and specific upper-case letters. 
+
+type ValidationCode = String
+
+-- The main code contains the information which is to be decoded and consists of numbers. 
+
+type MainCode = String
+
+-- The decryption code is used to choose which algorithm is to be used to decipher the code 
+-- and can contain numbers as well as upper-case letters.  
+
+type DecryptionCode = String
+
+-- The determination code stands for the algorithm used to decipher the code.
+
+type DeterminationCode = String
+
+-- The code-number is transformed into the decoded symbol and functions mainly 
+-- as an index number to access the list containing all symbols.
+
+type CodeNumber = Int
+
+-- The precode is a list of all the code-numbers generated while decrypting the code. 
+
+type PreCode = [CodeNumber]
+
+-- A symbol is a single, decrypted Char. 
+
+type Symbol = Char
+
+-- The result contains all the Symbols generated while decrypting the code. 
+
+type Result = [Symbol]
+
+
