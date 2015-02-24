@@ -1,0 +1,93 @@
+module AuxiliaryFunctions where
+
+import Datatypes
+import Data.Char
+
+-- @Author: Mike Kerkhoff, 2015
+-- 
+
+-- Within this module you can find all the necessary auxiliary functions for the decoder to work.  
+-- Some of which ease the work with touples or with the IO: 
+-- 
+-- 	first_Element 		// Returns the first element of a touple
+--
+-- 	second_Element 	 	// Returns the second element of a touple
+--
+-- 	third_Element 		// Returns the third element of a touple
+--
+-- 	constructCode 		// This function is given three strings and returns a code
+-- 
+-- 	showCode		// This function is given a validation code, a main code 
+--				// and a decrytion code as Strings and recombines them into one single String.
+-- 
+-- 	blankLines		// Prints two blank lines on the terminal
+--
+-- 	CharToInt		// Transforms a Char <- ['1'..'9'] into its corresponding Int
+-- 
+-- For more information on the functions please check the comments beneath
+
+{- 
+
+Auxiliary functions concerning the IO
+
+-}
+
+-- Takes a validation code, a main code and a decription code and returns them as code 
+
+showCode :: ValidationCode -> MainCode -> DecryptionCode -> String
+showCode a b c = a ++ ", " ++ b ++ ", " ++ c
+
+-- Returns two blank lines and prints them on the terminal
+
+blankLines :: IO()
+blankLines = do 
+		   	putStr "\n"
+		  	putStr "\n"
+
+-- Takes an Integer-Char and transforms it into it's Int-value
+
+charToInt :: Char -> Int
+charToInt a 
+	   | a == '0' = 0
+	   | a == '1' = 1
+	   | a == '2' = 2
+	   | a == '3' = 3
+	   | a == '4' = 4
+	   | a == '5' = 5
+	   | a == '6' = 6
+	   | a == '7' = 7
+	   | a == '8' = 8
+	   | a == '9' = 9
+	   | otherwise = 0
+
+{- 
+
+Auxiliary functions for touples
+
+-}
+
+
+-- Retuns the first element of a touple
+
+firstElement :: (a, b, c) -> a
+firstElement (a, b, c) = a
+
+-- Returns the second element of a touple
+
+secondElement :: (a, b, c) -> b
+secondElement (a, b, c) = b
+
+-- Returns the third element of a touple
+
+thirdElement :: (a, b, c) -> c 
+thirdElement (a, b, c) = c
+
+-- Takes three Strings (a validation code, a main code an a decryption code) and returns them as String
+
+constructCode :: ValidationCode -> MainCode -> DecryptionCode -> Code
+constructCode a b c = (a, b, c) 
+
+-- Generates a list of touples containing each an index value and a Char 
+
+symbol_List :: [(Int, Char)]
+symbol_List = zip [1..81] [','..'}']
