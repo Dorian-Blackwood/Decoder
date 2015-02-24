@@ -1,0 +1,108 @@
+module Decryption where
+
+import Datatypes
+import AuxiliaryFunctions
+import ErrorFunctions
+import Verification
+import Data.Char
+
+-- @Author: Mike Kerkhoff, 2015
+--
+--
+-- In this module you can find all the functions needed to decrypt a code consisting of a touple with three
+-- elements (validation code, main code, decryption code).  
+-- 
+-- The process of code-decryption is accomplished by a number of different steps. 
+-- Firstly (1.) the function 'check_decryptionCode' is invoked as part of the function 'decode'.
+-- 'check_decryptionCode' uses the auxiliary functions 'check_Char' and 'check_Int' to determine and 
+-- return the value of the determination code, which is later on used to decide what kind of algorithm
+-- should be used to decrypt the main code. 
+--
+-- Depending on the compositon of the decryption code it is translated into a clearly defined
+-- determination code. 
+-- 
+-- Next (2.) we invoke the function 'decode_DeterminationCode', which takes a determination 
+-- code and a valid main code and returns a pre-code containing a list of code-numbers that 
+-- later on are translated into the corresponding symbols. The determination code is used to determine
+-- which algorithm is to be used to combine or change the values stored within the main code.   
+-- 
+-- Thirdly the function 'symbol_Decode' is called upon and given a determination code and a code-number.
+-- It then uses the code-number as an index to access the contents of 'symbol_List' and replace them accordingly. 
+--
+-- In conclusion I want to say a few things about the functions 'decrypt_Precode', 'decode' and 'decodeTwo',
+-- which are used to initiate the decoding process:
+-- 
+-- (4.) The function 'decrypt_Precode' takes a Precode and returns a list of decrypted  
+-- symbols by invoking the function 'symbol_Decode'. 
+--
+-- (5.) The function 'decode' takes a code and checks if it is valid. If it is not valid it 
+-- returns an error message. Else it invokes the function 'decrypt_Precode' 
+--
+-- (6.) The function 'decodeTwo' takes two codes and decrypts them by invoking twice the function
+-- 'decode'. 
+
+-- Takes a DecryptionCode and returns a DeterminationCode which later on decides which algorithm
+-- is to be used to decipher the main code. 
+
+check_decryptionCode :: DecryptionCode -> DeterminationCode
+check_decryptionCode (a:b:c:d:[])		
+		
+				| (check_Int a)  && (b == '1') 	       && (c == '1')	       && (d == '1')	       = "BAAA"
+				| (a == '3')	       && (b == 'C')	       && (c == 'C')	       && (d == '3')	       = "1001"	
+				| (check_Char a) && (check_Char b) && (check_Int c)  && (check_Int d)  = "AA11"
+				| (check_Int a)  && (check_Int b)  && (check_Char c) && (check_Char d) = "11AA"
+				| (check_Int a)  && (check_Int b)  && (check_Int c)  && (check_Int d)  = "1111"
+	 			| (check_Char a) && (check_Char b) && (check_Char c) && (check_Char d) = "AAAA"	
+				| otherwise = error "Invalid input: Error code - 1 \n Your determination code is not yet defined"
+
+-- Takes a MainCode and a DeterminationCode and returns a Precode containing a list of CodeNumbers
+
+decode_DeterminationCode :: MainCode -> DeterminationCode -> PreCode
+decode_DeterminationCode (a:[]) determination_code = error "Invalid input: Error-Code - 2 \n Your main code is not valid"
+decode_DeterminationCode (a:b:[]) determination_code = error "Invalid input: Error-Code - 3 \n Your main code is not valid"
+decode_DeterminationCode (a:b:c:[]) determination_code = error "Invalid input: Error-Code - 4 \n Your main code is not valid"
+decode_DeterminationCode (a:b:c:d:[]) determination_code
+
+	     			| determination_code == "AA11" = (charToInt a * charToInt b):(charToInt c * charToInt d):[]
+	     			| determination_code == "11AA" = (charToInt a + charToInt b):(charToInt c + charToInt d):[]
+				| determination_code == "BAAA" = (charToInt a + charToInt b):(charToInt b * charToInt c):(charToInt a):[]
+				| otherwise = error "Invalid input: Error code - 5 \n Your determination code is not yet defined"
+
+
+decode_DeterminationCode (a:b:c:d:e:[]) determination_code
+				
+				| determination_code == "1111" = (charToInt a + charToInt b):(charToInt c + charToInt d):[]
+	     			| determination_code == "AAAA" = (charToInt a * charToInt b):(charToInt c * charToInt d):[]
+				| otherwise = error "Invalid input: Error code - 6 \n Your determination code is not yet defined"
+
+-- Takes a CodeNumber and a DeterminationCode to access the list of touples 'symbol_List' 
+-- to return a symbol using the CodeNumber as index. 
+
+
+symbol_Decode :: CodeNumber -> DeterminationCode -> Symbol
+symbol_Decode sum_code determination_code
+
+	     | determination_code == "11AA" = (snd((symbol_List)!!sum_code))
+	     | determination_code == "AA11" = (snd((symbol_List)!!sum_code))
+	     | otherwise = error "Invalid input: Error code - 7 \n Your main code is not yet defined"
+
+
+-- Takes a PreCode and a DeterminationCode and decodes the PreCode using the function 'symbol_Decode'
+
+decrypt_Precode :: PreCode -> DeterminationCode -> Result
+decrypt_Precode [] determination_code = []
+decrypt_Precode (x:[]) determination_code = (symbol_Decode x determination_code):[]
+decrypt_Precode (x:xs) determination_code = (symbol_Decode x determination_code):(decrypt_Precode xs determination_code) 
+
+-- Takes a code of the following definition and decrypts it: 
+-- (ValidationCode, MainCode, DecryptionCode)
+
+decode :: Code -> Result
+decode (a, b, c) = if (check_Code (a, b, c)) 
+		   then (decrypt_Precode (decode_DeterminationCode (b) (check_decryptionCode (c))) (check_decryptionCode (c))) 
+		   else (error "Invalid input: Error code - 7 \n Your code is not valid")
+
+-- Takes two different codes and decrypts them
+
+decodeTwo :: Code -> Code -> Result
+decodeTwo (a, b, c) (d, e, f) = decode (a, b, c) ++ decode (d, e, f)
